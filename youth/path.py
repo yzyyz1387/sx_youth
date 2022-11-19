@@ -16,3 +16,4 @@ YOUTH_DATA_PATH = LOCAL / 'youth_data.json'
 YOUTH_QQ_PATH = LOCAL / 'youth_qq.json'
 IMG_OUTPUT_PATH = LOCAL / 'img_output'
 VERIFY_PATH = IMG_OUTPUT_PATH / "verify"
+LOCK_PATH = LOCAL / 'lock.txt'

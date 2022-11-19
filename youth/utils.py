@@ -132,18 +132,19 @@ async def plugin_init():
     Path.mkdir(IMG_OUTPUT_PATH) if not Path.exists(IMG_OUTPUT_PATH) else ...
     Path.mkdir(OUTPUT_PATH) if not Path.exists(OUTPUT_PATH) else ...
     Path.mkdir(VERIFY_PATH) if not Path.exists(VERIFY_PATH) else ...
-    # LOCAL目录 下是否有 xlsx 文件 或者 xls 文件
+    if LOCK_PATH.exists():
+        LOCK_PATH.unlink()
     for i in list(LOCAL.iterdir()):
         if i.suffix in ['.xlsx', '.xls']:
             try:
                 workbook_ = load_workbook(i)
                 sheet_names = workbook_.sheetnames
                 sheet = workbook_[sheet_names[0]]
-                youth_qq_info={}
+                youth_qq_info = {}
                 for row in sheet.rows:
                     youth_qq_info[row[0].value] = row[1].value
                 workbook_.close()
-                await async_w(YOUTH_QQ_PATH,json.dumps(youth_qq_info,ensure_ascii=False))
+                await async_w(YOUTH_QQ_PATH, json.dumps(youth_qq_info, ensure_ascii=False))
                 break
             except:
                 logger.info("读取储存有qq信息的本地excel文件失败")
