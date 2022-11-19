@@ -46,8 +46,12 @@ youth_checker = on_command("查大学习", aliases={"查询大学习", "提醒�
 
 @youth_checker.handle()
 async def _(bot: Bot, event: MessageEvent, state: T_State, matcher: Matcher, args: Message = CommandArg()):
+    if LOCK_PATH.exists():
+        await youth_checker.finish("一个查询正在进行，请稍后再试")
+    else:
+        LOCK_PATH.touch()
     await youth_checker.send("请稍后...")
-    state["model"] = "normal"
+    state["mode"] = "normal"
     if isinstance(event, GroupMessageEvent):
         if event.group_id not in youth_group:
             await youth_checker.finish("本群不在配置的群列表中，无法使用此功能")
@@ -119,6 +123,7 @@ async def _(
                 headers=headers,
                 params=params
             )).json()
+            LOCK_PATH.unlink()
             if youth_data:
                 await async_w(YOUTH_DATA_PATH, json.dumps(youth_data, ensure_ascii=False))
                 isStudy, unfinished = await youth_analyze(youth_data)
@@ -127,12 +132,12 @@ async def _(
                 un_text = ""
                 for i in unfinished:
                     un_text += f"{i}\n"
-
+                # FIXME 不要问为什么总人数下面不都用三个字来格式化，因为会风控
                 r = "本次大学习统计如下：\n" \
                     f"总人数：{youth_data['data']['total']}\n" \
-                    f"已完成：{l_IS}\n" \
-                    f"未完成：{l_UF}\n" \
-                    f"完成率：{round(l_IS / int(youth_num) * 100, 2)}%\n"
+                    f"已学：{l_IS}\n" \
+                    f"未学：{l_UF}\n" \
+                    f"学习率：{round(l_IS / int(youth_num) * 100, 2)}%\n"
                 if l_UF > 0:
                     r += f"未完成名单：\n{un_text}"
                 elif l_UF == 0:
