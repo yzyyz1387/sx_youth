@@ -47,7 +47,7 @@ youth_checker = on_command("查大学习", aliases={"查询大学习", "提醒�
 @youth_checker.handle()
 async def _(bot: Bot, event: MessageEvent, state: T_State, matcher: Matcher, args: Message = CommandArg()):
     if LOCK_PATH.exists():
-        await youth_checker.finish("一个查询正在进行，请稍后再试")
+        await youth_checker.finish(MessageSegment.at(event.user_id)+"\n一个查询正在进行，请稍后再试")
     else:
         LOCK_PATH.touch()
     await youth_checker.send("请稍后...")
