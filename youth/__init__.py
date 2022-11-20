@@ -110,11 +110,16 @@ async def _(
                 "token": token,
                 "user-agent": str(user_agent.get_user_agent())
             }
+            oid = (await httpx_get(
+                url="https://www.sxgqt.org.cn/bgsxapiv2/organization/getOrganizeMess",
+                headers=headers
+            )).json()['data']['id']
+            OID_PATH.write_text(str(oid))
             params = {
                 'page': '1',
                 'rows': youth_num,
                 'keyword': '',
-                'oid': '100604258',
+                'oid': oid,
                 'leagueStatus': '',
                 'goHomeStatus': '',
                 'memberCardStatus': '',
@@ -122,11 +127,15 @@ async def _(
                 'isAll': ''
             }
             LOCK_PATH.unlink()
-            youth_data = (await httpx_get(
-                url="https://www.sxgqt.org.cn/bgsxapiv2/regiment",
-                headers=headers,
-                params=params
-            )).json()
+            try:
+                youth_data = (await httpx_get(
+                    url="https://www.sxgqt.org.cn/bgsxapiv2/regiment",
+                    headers=headers,
+                    params=params
+                )).json()
+            except AttributeError:
+                youth_data = None
+                await youth_checker.finish("服务器繁忙，请过会儿再来捏~")
             if youth_data:
                 await async_w(YOUTH_DATA_PATH, json.dumps(youth_data, ensure_ascii=False))
                 isStudy, unfinished = await youth_analyze(youth_data)
