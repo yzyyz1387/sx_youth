@@ -170,7 +170,8 @@ async def plugin_init():
 def signal_handler(signum, frame):
     print('signal_handler: caught signal ' + str(signum))
     if signum == signal.SIGINT.value:
-        print('操作被用户停止...')
+        logger.info("操作被用户停止")
+        LOCK_PATH.unlink()
         sys.exit(1)
 
 
