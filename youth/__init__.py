@@ -56,6 +56,7 @@ async def _(bot: Bot, event: MessageEvent, state: T_State, matcher: Matcher, arg
         if event.group_id not in youth_group:
             LOCK_PATH.unlink()
             await youth_checker.finish("本群不在配置的群列表中，无法使用此功能")
+            LOCK_PATH.unlink()
     if args:
         if str(args).replace(" ", "") == "@":
             if isinstance(event, GroupMessageEvent):
