@@ -99,9 +99,11 @@ async def _(
                 password=password,
                 verify=state["verify"])
         except OperationTimedOutError:
+            LOCK_PATH.unlink()
             await youth_checker.finish("登录超时，可能是验证码输入错误，重试请发送 “查大学习” ")
             token = None
         if not token:
+            LOCK_PATH.unlink()
             await youth_checker.finish("登录失败，请重试")
         else:
             headers = {
@@ -119,12 +121,12 @@ async def _(
                 'isPartyMember': '',
                 'isAll': ''
             }
+            LOCK_PATH.unlink()
             youth_data = (await httpx_get(
                 url="https://www.sxgqt.org.cn/bgsxapiv2/regiment",
                 headers=headers,
                 params=params
             )).json()
-            LOCK_PATH.unlink()
             if youth_data:
                 await async_w(YOUTH_DATA_PATH, json.dumps(youth_data, ensure_ascii=False))
                 isStudy, unfinished = await youth_analyze(youth_data)
