@@ -184,6 +184,7 @@ async def _(
                             logger.info("未找到姓名-QQ对应文件,使用普通模式")
                             await youth_checker.finish(r)
     except (FinishedException, RejectedException):
+        LOCK_PATH.unlink()
         pass
     except Exception as e:
         LOCK_PATH.unlink() if LOCK_PATH.exists() else None
