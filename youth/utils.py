@@ -171,7 +171,7 @@ def signal_handler(signum, frame):
     print('signal_handler: caught signal ' + str(signum))
     if signum == signal.SIGINT.value:
         logger.info("操作被用户停止")
-        LOCK_PATH.unlink()
+        LOCK_PATH.unlink() if LOCK_PATH.exists() else  ...
         sys.exit(1)
 
 
