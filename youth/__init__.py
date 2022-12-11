@@ -58,7 +58,7 @@ async def _(bot: Bot, event: MessageEvent, state: T_State, matcher: Matcher, arg
     state["mode"] = "normal"
     if isinstance(event, GroupMessageEvent):
         if event.group_id not in youth_group:
-            LOCK_PATH.unlink()
+            await unlock()
             await youth_checker.finish("本群不在配置的群列表中，无法使用此功能")
     if args:
         if str(args).replace(" ", "") == "@":
@@ -106,11 +106,11 @@ async def _(
                     password=password,
                     verify=state["verify"])
             except OperationTimedOutError:
-                LOCK_PATH.unlink()
+                await unlock()
                 await youth_checker.finish("登录超时，可能是验证码输入错误，重试请发送 “查大学习” ")
                 token = None
             if not token:
-                LOCK_PATH.unlink()
+                await unlock()
                 await youth_checker.finish("登录失败，请重试")
             else:
                 headers = {
@@ -133,7 +133,7 @@ async def _(
                     'isPartyMember': '',
                     'isAll': ''
                 }
-                LOCK_PATH.unlink()
+                await unlock()
                 try:
                     youth_data = (await httpx_get(
                         url="https://www.sxgqt.org.cn/bgsxapiv2/regiment",
@@ -184,9 +184,13 @@ async def _(
                             logger.info("未找到姓名-QQ对应文件,使用普通模式")
                             await youth_checker.finish(r)
     except (FinishedException, RejectedException):
-        LOCK_PATH.unlink()
+        await unlock()
         pass
     except Exception as e:
-        LOCK_PATH.unlink() if LOCK_PATH.exists() else None
+        await unlock()
         logger.error(e)
         await youth_checker.finish("发生了未知错误，请重试")
+
+
+async def unlock():
+    LOCK_PATH.unlink() if LOCK_PATH.exists() else None
