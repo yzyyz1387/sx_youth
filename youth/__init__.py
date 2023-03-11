@@ -118,7 +118,8 @@ async def _(
                     "user-agent": str(user_agent.get_user_agent())
                 }
                 oid = (await httpx_get(
-                    url="https://www.sxgqt.org.cn/bgsxapiv2/organization/getOrganizeMess",
+                    # url="https://www.sxgqt.org.cn/bgsxapiv2/organization/getOrganizeMess",
+                    url="https://api.sxgqt.org.cn/bgsxapiv2/organization/getOrganizeMess",
                     headers=headers
                 )).json()['data']['id']
                 OID_PATH.write_text(str(oid))
@@ -136,7 +137,8 @@ async def _(
                 await unlock()
                 try:
                     youth_data = (await httpx_get(
-                        url="https://www.sxgqt.org.cn/bgsxapiv2/regiment",
+                        # url="https://www.sxgqt.org.cn/bgsxapiv2/regiment",
+                        url="https://api.sxgqt.org.cn/bgsxapiv2/regiment",
                         headers=headers,
                         params=params
                     )).json()
@@ -190,6 +192,15 @@ async def _(
         await unlock()
         logger.error(e)
         await youth_checker.finish("发生了未知错误，请重试")
+
+
+un_lock = on_command("解锁", aliases={"解锁青年大学习"}, priority=5, block=True)
+
+
+@un_lock.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    await unlock()
+    await bot.send("完成")
 
 
 async def unlock():

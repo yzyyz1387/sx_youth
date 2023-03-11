@@ -78,7 +78,7 @@ async def get_main_cookies(context: BrowserContext, page: Page, account: str, pa
         await page.locator("[placeholder=\"请输入密码\"]").fill(password)
         await page.locator("[placeholder=\"请输入验证码\"]").fill(verify)
         await page.locator("button:has-text(\"登 录\")").click()
-        await page.wait_for_url("https://www.sxgqt.org.cn/bgsxv2/reunion/member/groupFareManagement")
+        await page.wait_for_url("https://www1.sxgqt.org.cn/bgsxv2/reunion/member/memberList")
         html = await page.content()
         await context.storage_state(path=AUTH_PATH)
         await page.close()
@@ -100,6 +100,7 @@ async def get_main_cookies(context: BrowserContext, page: Page, account: str, pa
 
     except TimeoutError:
         logger.warning("操作超时，请重试")
+        await context.close()
         raise OperationTimedOutError
 
 
@@ -109,7 +110,7 @@ async def playwright_login() -> Union[tuple[BrowserContext, Page], str]:
     context = await browser.new_context(locale="zh-CN")
     page = await context.new_page()
     try:
-        await page.goto("https://www.sxgqt.org.cn/bgsxv2/login?redirect=%2Freunion%2Fmember%2FgroupFareManagement")
+        await page.goto("https://www1.sxgqt.org.cn/bgsxv2/login?redirect=%2Freunion%2Fmember%2FmemberList")
         img = await page.locator('//*[@id="pane-first"]/div/div/form/div[3]/div/img').screenshot(type="jpeg",
                                                                                                  path=VERIFY_PATH / "verify.jpg",
                                                                                                  quality=100)
